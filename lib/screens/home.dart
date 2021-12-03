@@ -96,7 +96,7 @@ class _Home extends State<Home> {
             ),
           ),
           actions: [
-            (selectedNoteIds.isEmpty
+            (selectedNoteIds.isNotEmpty
                 ? IconButton(
                     icon: const Icon(
                       Icons.delete,
@@ -111,23 +111,26 @@ class _Home extends State<Home> {
         body: FutureBuilder(
           future: readDatabase(),
           // Need to find some way to auto-reload it
-          // For now we need to reload the full app to see new list
+          // Until now, it reload only on this Widget's updates
+          // If we update the state at the exit of notes_edit, it doesn't work
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              notesData = snapshot.data as List<Map<String, dynamic>>;
-              return Stack(
-                children: <Widget>[
-                  AllNoteLists(
-                    snapshot.data,
-                    selectedNoteIds,
-                    afterNavigatorPop,
-                    handleNoteListLongPress,
-                    handleNoteListTapAfterSelect,
-                  ),
-                ],
-              );
-            } else if (snapshot.hasError) {
-              print('Error handling database');
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasData) {
+                notesData = snapshot.data as List<Map<String, dynamic>>;
+                return Stack(
+                  children: <Widget>[
+                    AllNoteLists(
+                      snapshot.data,
+                      selectedNoteIds,
+                      afterNavigatorPop,
+                      handleNoteListLongPress,
+                      handleNoteListTapAfterSelect,
+                    ),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                print('Error handling database');
+              }
             }
 
             return const Center(

@@ -110,9 +110,6 @@ class _Home extends State<Home> {
         ),
         body: FutureBuilder(
           future: readDatabase(),
-          // Need to find some way to auto-reload it
-          // Until now, it reload only on this Widget's updates
-          // If we update the state at the exit of notes_edit, it doesn't work
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasData) {
@@ -151,7 +148,9 @@ class _Home extends State<Home> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const NotesEdit(['new', {}])),
-            );
+            ).then((dynamic value) {
+              afterNavigatorPop();
+            });
           },
         ),
       ),
